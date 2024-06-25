@@ -7,7 +7,7 @@ const hostname = "http://localhost:3003";
 const server = http.createServer((request, response) => {
   const url = new URL(request.url, hostname);
   const userName = url.searchParams.has("hello");
-  // console.log(userName);
+
 
   if (userName) {
     const value = url.searchParams.get("hello");
@@ -45,7 +45,6 @@ const server = http.createServer((request, response) => {
       break;
 
     default:
-      // console.log('hello smth');
       response.statusCode = 500;
       response.statusMessage = "Server Error";
       response.setHeader("Content-Type", "text/plain");
