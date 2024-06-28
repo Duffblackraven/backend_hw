@@ -1,61 +1,20 @@
-const http = require("http");
-const getUsers = require("./modules/users.js");
+const express = require('express');
+const dotenv = require('dotenv');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const bookRouter = require('./routes/books');
+const userRouter = require('./routes/users');
 
-const port = 3003;
-const hostname = "http://localhost:3003";
-
-const server = http.createServer((request, response) => {
-  const url = new URL(request.url, hostname);
-  const userName = url.searchParams.has("hello");
-
-
-  if (userName) {
-    const value = url.searchParams.get("hello");
-    console.log(value);
-    if (!value) {
-      response.statusCode = 500;
-      response.statusMessage = "Server Error";
-      response.setHeader("Content-Type", "text/plain");
-      response.write("Enter a name");
-      response.end();
-      return;
-    }
-    response.statusCode = 200;
-    response.statusMessage = "ok";
-    response.setHeader("Content-Type", "text/plain");
-    response.write(`Hello,${value}`);
-    response.end();
-    return;
-  }
-  switch (request.url) {
-    case "/users":
-      response.statusCode = 200;
-      response.statusMessage = "OK";
-      response.setHeader("Content-Type", "application/json");
-      response.write(getUsers());
-      response.end();
-      break;
-
-    case "/":
-      response.statusCode = 200;
-      response.statusMessage = "OK";
-      response.setHeader("Content-Type", "text/plain");
-      response.write("Hello world");
-      response.end();
-      break;
-
-    default:
-      response.statusCode = 500;
-      response.statusMessage = "Server Error";
-      response.setHeader("Content-Type", "text/plain");
-      response.write("Invalid request");
-      response.end();
-      break;
-  }
-});
-
-server.listen(port, () => {
-  console.log(`Сервер запущен по адресу ${hostname}/`);
-});
-
-
+const app = express();
+dotenv.config();
+const { PORT, API_URL, DB_URL } = process.env;
+console.log(DB_URL);
+mongoose.connect(DB_URL).then(() => console.log('connected mongodb')).catch((error) => console.log(error));
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bookRouter);
+app.use(userRouter);
+app.listen(PORT, () => {
+  console.log(`Сервер запущен по адресу ${API_URL}:${PORT}`);
+})
